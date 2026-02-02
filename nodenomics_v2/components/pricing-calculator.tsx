@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import {
   Bar,
   BarChart,
@@ -37,6 +37,10 @@ import {
   Clock,
   TrendingDown,
   Zap,
+  BarChart3,
+  LineChartIcon,
+  PieChart,
+  Sparkles,
 } from "lucide-react"
 
 const providerColors = {
@@ -44,6 +48,38 @@ const providerColors = {
   "Azure VM": "#0078D4",
   "Google Cloud": "#4285F4",
   Nodenomics: "#14B8A6",
+}
+
+// Animated number component
+function AnimatedNumber({ value, decimals = 2 }: { value: number; decimals?: number }) {
+  const [displayValue, setDisplayValue] = useState(0)
+  const previousValue = useRef(0)
+
+  useEffect(() => {
+    const start = previousValue.current
+    const end = value
+    const duration = 500
+    const startTime = Date.now()
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      // Easing function
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const current = start + (end - start) * eased
+      setDisplayValue(current)
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        previousValue.current = end
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [value])
+
+  return <>{displayValue.toFixed(decimals)}</>
 }
 
 export function PricingCalculator() {
@@ -55,6 +91,7 @@ export function PricingCalculator() {
   })
 
   const [activeView, setActiveView] = useState<"comparison" | "timeline" | "savings">("comparison")
+  const [isHovered, setIsHovered] = useState<string | null>(null)
 
   // Calculate prices for all providers
   const prices = useMemo(() => {
@@ -78,7 +115,7 @@ export function PricingCalculator() {
       const month = i + 1
       const monthConfig = { ...config, hours: 720 * month }
       return {
-        month: `Month ${month}`,
+        month: `M${month}`,
         AWS: calculatePrice(cloudProviders[0], monthConfig),
         Azure: calculatePrice(cloudProviders[1], monthConfig),
         GCP: calculatePrice(cloudProviders[2], monthConfig),
@@ -99,7 +136,7 @@ export function PricingCalculator() {
         calculatePrice(cloudProviders[2], monthConfig)
       ) / 3
       return {
-        month: `Month ${month}`,
+        month: `M${month}`,
         savings: avgOthers - nodenomicsPrice,
         cumulative: Array.from({ length: month }, (_, j) => {
           const mConfig = { ...config, hours: 720 * (j + 1) }
@@ -119,26 +156,39 @@ export function PricingCalculator() {
     setConfig((prev) => ({ ...prev, [key]: value }))
   }
 
+  const viewButtons = [
+    { id: "comparison" as const, label: "Comparison", icon: BarChart3 },
+    { id: "timeline" as const, label: "Timeline", icon: LineChartIcon },
+    { id: "savings" as const, label: "Savings", icon: PieChart },
+  ]
+
   return (
     <div className="space-y-8">
       {/* Configuration Panel */}
-      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Server className="w-5 h-5 text-primary" />
-            Configure Your Compute Requirements
+      <Card className="glass-card border-border/50 overflow-hidden">
+        <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent">
+          <CardTitle className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Server className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <span className="block">Configure Your Compute Requirements</span>
+              <span className="text-sm font-normal text-muted-foreground">Adjust sliders to see real-time pricing</span>
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <CardContent className="p-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* vCPUs */}
-            <div className="space-y-4">
+            <div className="space-y-5 group">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-primary" />
-                  <span className="font-medium">vCPUs</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Cpu className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold">vCPUs</span>
                 </div>
-                <Badge variant="outline" className="font-mono">
+                <Badge variant="outline" className="font-mono text-lg px-3 py-1 bg-background">
                   {config.vcpus}
                 </Badge>
               </div>
@@ -148,22 +198,24 @@ export function PricingCalculator() {
                 min={1}
                 max={32}
                 step={1}
-                className="[&>span:first-child]:bg-primary/30 [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
+                className="[&>span:first-child]:h-2 [&>span:first-child]:bg-secondary [&_[role=slider]]:bg-primary [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:shadow-lg [&_[role=slider]]:shadow-primary/30 [&>span:first-child>span]:bg-primary"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>1</span>
-                <span>32</span>
+                <span>1 core</span>
+                <span>32 cores</span>
               </div>
             </div>
 
             {/* Memory */}
-            <div className="space-y-4">
+            <div className="space-y-5 group">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-primary" />
-                  <span className="font-medium">Memory (GB)</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Zap className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold">Memory</span>
                 </div>
-                <Badge variant="outline" className="font-mono">
+                <Badge variant="outline" className="font-mono text-lg px-3 py-1 bg-background">
                   {config.memory} GB
                 </Badge>
               </div>
@@ -173,7 +225,7 @@ export function PricingCalculator() {
                 min={2}
                 max={64}
                 step={2}
-                className="[&>span:first-child]:bg-primary/30 [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
+                className="[&>span:first-child]:h-2 [&>span:first-child]:bg-secondary [&_[role=slider]]:bg-primary [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:shadow-lg [&_[role=slider]]:shadow-primary/30 [&>span:first-child>span]:bg-primary"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>2 GB</span>
@@ -182,13 +234,15 @@ export function PricingCalculator() {
             </div>
 
             {/* Storage */}
-            <div className="space-y-4">
+            <div className="space-y-5 group">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-primary" />
-                  <span className="font-medium">Storage (GB)</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <HardDrive className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold">Storage</span>
                 </div>
-                <Badge variant="outline" className="font-mono">
+                <Badge variant="outline" className="font-mono text-lg px-3 py-1 bg-background">
                   {config.storage} GB
                 </Badge>
               </div>
@@ -198,7 +252,7 @@ export function PricingCalculator() {
                 min={50}
                 max={2000}
                 step={50}
-                className="[&>span:first-child]:bg-primary/30 [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
+                className="[&>span:first-child]:h-2 [&>span:first-child]:bg-secondary [&_[role=slider]]:bg-primary [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:shadow-lg [&_[role=slider]]:shadow-primary/30 [&>span:first-child>span]:bg-primary"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>50 GB</span>
@@ -207,13 +261,15 @@ export function PricingCalculator() {
             </div>
 
             {/* Hours */}
-            <div className="space-y-4">
+            <div className="space-y-5 group">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" />
-                  <span className="font-medium">Hours/Month</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Clock className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold">Hours</span>
                 </div>
-                <Badge variant="outline" className="font-mono">
+                <Badge variant="outline" className="font-mono text-lg px-3 py-1 bg-background">
                   {config.hours}h
                 </Badge>
               </div>
@@ -223,7 +279,7 @@ export function PricingCalculator() {
                 min={100}
                 max={720}
                 step={20}
-                className="[&>span:first-child]:bg-primary/30 [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
+                className="[&>span:first-child]:h-2 [&>span:first-child]:bg-secondary [&_[role=slider]]:bg-primary [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:shadow-lg [&_[role=slider]]:shadow-primary/30 [&>span:first-child>span]:bg-primary"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>100h</span>
@@ -235,62 +291,77 @@ export function PricingCalculator() {
       </Card>
 
       {/* Savings Highlight */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/30">
-          <CardContent className="p-6 text-center">
-            <TrendingDown className="w-8 h-8 text-primary mx-auto mb-2" />
-            <p className="text-3xl font-bold text-primary mb-1">
-              {savings.percentage.toFixed(0)}%
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card className="premium-card bg-gradient-to-br from-primary/15 via-primary/10 to-transparent border-primary/30 overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
+          <CardContent className="p-8 text-center relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
+              <TrendingDown className="w-7 h-7 text-primary" />
+            </div>
+            <p className="text-5xl font-bold text-primary mb-2 font-mono">
+              <AnimatedNumber value={savings.percentage} decimals={0} />%
             </p>
-            <p className="text-sm text-muted-foreground">Average Savings</p>
+            <p className="text-sm text-muted-foreground font-medium">Average Savings vs Cloud</p>
           </CardContent>
         </Card>
-        <Card className="bg-card/50 border-border/50">
-          <CardContent className="p-6 text-center">
-            <p className="text-3xl font-bold text-foreground mb-1">
-              ${savings.amount.toFixed(2)}
+        <Card className="glass-card border-border/50">
+          <CardContent className="p-8 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/50 flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-7 h-7 text-foreground" />
+            </div>
+            <p className="text-5xl font-bold text-foreground mb-2 font-mono">
+              $<AnimatedNumber value={savings.amount} />
             </p>
-            <p className="text-sm text-muted-foreground">Saved vs Cloud Avg</p>
+            <p className="text-sm text-muted-foreground font-medium">Saved vs Cloud Average</p>
           </CardContent>
         </Card>
-        <Card className="bg-card/50 border-border/50">
-          <CardContent className="p-6 text-center">
-            <p className="text-3xl font-bold text-primary mb-1">
-              ${prices.find((p) => p.name === "Nodenomics")?.price.toFixed(2)}
+        <Card className="glass-card border-border/50">
+          <CardContent className="p-8 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Server className="w-7 h-7 text-primary" />
+            </div>
+            <p className="text-5xl font-bold text-primary mb-2 font-mono">
+              $<AnimatedNumber value={prices.find((p) => p.name === "Nodenomics")?.price || 0} />
             </p>
-            <p className="text-sm text-muted-foreground">Nodenomics Price</p>
+            <p className="text-sm text-muted-foreground font-medium">Nodenomics Monthly Price</p>
           </CardContent>
         </Card>
       </div>
 
       {/* View Toggle */}
-      <div className="flex justify-center gap-2">
-        {(["comparison", "timeline", "savings"] as const).map((view) => (
-          <Button
-            key={view}
-            variant={activeView === view ? "default" : "outline"}
-            onClick={() => setActiveView(view)}
-            className={
-              activeView === view
-                ? "bg-primary hover:bg-primary/90"
-                : "border-primary/50 hover:bg-primary/10"
-            }
-          >
-            {view.charAt(0).toUpperCase() + view.slice(1)}
-          </Button>
-        ))}
+      <div className="flex justify-center">
+        <div className="inline-flex bg-secondary/30 backdrop-blur-sm rounded-xl p-1.5 border border-border/50">
+          {viewButtons.map((view) => (
+            <Button
+              key={view.id}
+              variant="ghost"
+              onClick={() => setActiveView(view.id)}
+              className={`relative px-6 py-2.5 rounded-lg transition-all duration-300 ${
+                activeView === view.id
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+                  : "hover:bg-secondary/50 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <view.icon className="w-4 h-4 mr-2" />
+              {view.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Charts */}
-      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-        <CardHeader>
-          <CardTitle>
+      <Card className="glass-card border-border/50 overflow-hidden">
+        <CardHeader className="border-b border-border/50">
+          <CardTitle className="flex items-center gap-3">
+            {activeView === "comparison" && <BarChart3 className="w-5 h-5 text-primary" />}
+            {activeView === "timeline" && <LineChartIcon className="w-5 h-5 text-primary" />}
+            {activeView === "savings" && <PieChart className="w-5 h-5 text-primary" />}
             {activeView === "comparison" && "Cost Comparison by Provider"}
             {activeView === "timeline" && "12-Month Cost Projection"}
-            {activeView === "savings" && "Cumulative Savings Over Time"}
+            {activeView === "savings" && "Monthly Savings Over Time"}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {activeView === "comparison" && (
             <ChartContainer
               config={{
@@ -302,28 +373,35 @@ export function PricingCalculator() {
                 <BarChart
                   data={prices}
                   layout="vertical"
-                  margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+                  margin={{ top: 20, right: 40, left: 120, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={true} vertical={false} />
                   <XAxis
                     type="number"
                     tickFormatter={(value) => `$${value.toFixed(0)}`}
                     stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
                   />
                   <YAxis
                     type="category"
                     dataKey="name"
                     stroke="hsl(var(--muted-foreground))"
+                    fontSize={13}
+                    fontWeight={500}
+                    tickLine={false}
+                    axisLine={false}
                   />
                   <ChartTooltip
                     content={<ChartTooltipContent />}
-                    formatter={(value: number) => [`$${value.toFixed(2)}`, "Cost"]}
+                    formatter={(value: number) => [`$${value.toFixed(2)}`, "Monthly Cost"]}
+                    cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
                   />
-                  <Bar dataKey="price" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="price" radius={[0, 8, 8, 0]} barSize={40}>
                     {prices.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={providerColors[entry.name as keyof typeof providerColors]}
+                        fillOpacity={entry.name === "Nodenomics" ? 1 : 0.7}
                       />
                     ))}
                   </Bar>
@@ -348,22 +426,24 @@ export function PricingCalculator() {
                   margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                   <YAxis
-                    tickFormatter={(value) => `$${value.toFixed(0)}`}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
                     stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
                   />
                   <ChartTooltip
                     content={<ChartTooltipContent />}
                     formatter={(value: number) => [`$${value.toFixed(2)}`, ""]}
                   />
-                  <Legend />
+                  <Legend wrapperStyle={{ paddingTop: 20 }} />
                   <Line
                     type="monotone"
                     dataKey="AWS"
                     stroke="#FF9900"
                     strokeWidth={2}
                     dot={false}
+                    strokeOpacity={0.7}
                   />
                   <Line
                     type="monotone"
@@ -371,6 +451,7 @@ export function PricingCalculator() {
                     stroke="#0078D4"
                     strokeWidth={2}
                     dot={false}
+                    strokeOpacity={0.7}
                   />
                   <Line
                     type="monotone"
@@ -378,13 +459,15 @@ export function PricingCalculator() {
                     stroke="#4285F4"
                     strokeWidth={2}
                     dot={false}
+                    strokeOpacity={0.7}
                   />
                   <Line
                     type="monotone"
                     dataKey="Nodenomics"
                     stroke="#14B8A6"
                     strokeWidth={3}
-                    dot={false}
+                    dot={{ fill: '#14B8A6', strokeWidth: 0, r: 4 }}
+                    activeDot={{ r: 6, fill: '#14B8A6' }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -405,15 +488,16 @@ export function PricingCalculator() {
                 >
                   <defs>
                     <linearGradient id="savingsGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#14B8A6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#14B8A6" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#14B8A6" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                   <YAxis
                     tickFormatter={(value) => `$${value.toFixed(0)}`}
                     stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
                   />
                   <ChartTooltip
                     content={<ChartTooltipContent />}
@@ -423,8 +507,10 @@ export function PricingCalculator() {
                     type="monotone"
                     dataKey="savings"
                     stroke="#14B8A6"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     fill="url(#savingsGradient)"
+                    dot={{ fill: '#14B8A6', strokeWidth: 0, r: 4 }}
+                    activeDot={{ r: 6, fill: '#14B8A6', stroke: '#fff', strokeWidth: 2 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -438,48 +524,59 @@ export function PricingCalculator() {
         {prices.map((provider) => (
           <Card
             key={provider.name}
-            className={`border-2 transition-all ${
+            className={`transition-all duration-300 cursor-pointer ${
               provider.name === "Nodenomics"
-                ? "border-primary bg-primary/5 pulse-glow"
-                : "border-border/50 bg-card/50"
+                ? "border-2 border-primary bg-gradient-to-br from-primary/10 to-transparent pulse-glow"
+                : "glass-card border-border/50 hover:border-primary/30"
             }`}
+            onMouseEnter={() => setIsHovered(provider.name)}
+            onMouseLeave={() => setIsHovered(null)}
+            style={{
+              transform: isHovered === provider.name ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
+            }}
           >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
                 <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: provider.color }}
+                  className="w-4 h-4 rounded-full shadow-lg"
+                  style={{
+                    backgroundColor: provider.color,
+                    boxShadow: `0 0 12px ${provider.color}50`
+                  }}
                 />
-                <span className="font-medium text-sm">{provider.name}</span>
+                <span className="font-semibold">{provider.name}</span>
                 {provider.name === "Nodenomics" && (
-                  <Badge className="ml-auto bg-primary/20 text-primary border-primary/30 text-xs">
+                  <Badge className="ml-auto bg-primary/20 text-primary border-primary/30">
                     Best Value
                   </Badge>
                 )}
               </div>
-              <p className="text-2xl font-bold font-mono">
-                ${provider.price.toFixed(2)}
+              <p className="text-3xl font-bold font-mono mb-1">
+                $<AnimatedNumber value={provider.price} />
               </p>
-              <p className="text-xs text-muted-foreground">per month</p>
+              <p className="text-sm text-muted-foreground">per month</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Info Banner */}
-      <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-6 h-6 text-primary" />
+      <Card className="premium-card bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20 overflow-hidden">
+        <CardContent className="p-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-8 h-8 text-primary" />
             </div>
-            <div className="text-center md:text-left">
-              <h3 className="font-semibold mb-1">Why Nodenomics is More Affordable</h3>
-              <p className="text-sm text-muted-foreground">
-                Decentralized compute leverages idle resources across the network, eliminating traditional data center overhead. 
+            <div className="text-center md:text-left flex-1">
+              <h3 className="font-bold text-lg mb-2">Why Nodenomics is More Affordable</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Decentralized compute leverages idle resources across the network, eliminating traditional data center overhead.
                 Smart contracts automate transactions, and DAG-based micropayments enable pay-per-use pricing without minimum commitments.
               </p>
             </div>
+            <Button className="bg-primary hover:bg-primary/90 btn-shimmer shrink-0">
+              Learn More
+            </Button>
           </div>
         </CardContent>
       </Card>
