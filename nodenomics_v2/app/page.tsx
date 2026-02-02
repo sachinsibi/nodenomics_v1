@@ -33,6 +33,7 @@ import { researchThemes, researchStats, keyTechnologies } from "@/lib/research-d
 import { faqCategories } from "@/lib/faq-data"
 import { PricingCalculator } from "@/components/pricing-calculator"
 import { MatrixRain } from "@/components/matrix-rain"
+import { ChatWidget } from "@/components/chat-widget"
 
 type TabSection = "home" | "impact" | "research" | "partners" | "faq"
 
@@ -383,6 +384,7 @@ export default function NodenomicsLanding() {
           </div>
         </div>
       </footer>
+      <ChatWidget />
     </div>
   )
 }
