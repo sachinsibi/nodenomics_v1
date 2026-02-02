@@ -1,12 +1,5 @@
 {
-  "buildCommand": "cd nodenomics && npm run build",
-  "outputDirectory": "nodenomics/.next",
-  "installCommand": "cd nodenomics && npm install",
-  "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/nodenomics/$1"
-    }
-  ]
+  "buildCommand": "npm run build --prefix nodenomics",
+  "installCommand": "npm install --prefix nodenomics",
+  "outputDirectory": "nodenomics/.next"
 }
