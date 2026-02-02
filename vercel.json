@@ -1,5 +1,0 @@
-{
-  "buildCommand": "npm run build --prefix nodenomics",
-  "installCommand": "npm install --prefix nodenomics",
-  "outputDirectory": "nodenomics/.next"
-}
