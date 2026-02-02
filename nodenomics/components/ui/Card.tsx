@@ -5,13 +5,15 @@ interface CardProps {
   variant?: 'default' | 'bordered' | 'highlighted';
   hover?: boolean;
   className?: string;
+  onClick?: () => void;
 }
 
 export default function Card({
   children,
   variant = 'default',
   hover = true,
-  className = ''
+  className = '',
+  onClick
 }: CardProps) {
   const baseStyles = 'rounded-lg p-6';
 
@@ -24,7 +26,10 @@ export default function Card({
   const hoverStyles = hover ? 'hover:border-[#14B8A6] transition-all duration-300' : '';
 
   return (
-    <div className={`${baseStyles} ${variantStyles[variant]} ${hoverStyles} ${className}`}>
+    <div
+      className={`${baseStyles} ${variantStyles[variant]} ${hoverStyles} ${className}`}
+      onClick={onClick}
+    >
       {children}
     </div>
   );
