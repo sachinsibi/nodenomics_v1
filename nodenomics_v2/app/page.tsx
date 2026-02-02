@@ -141,11 +141,34 @@ function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: strin
   )
 }
 
+// Matrix rain component
+function MatrixRain() {
+  const columns = 15
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      {[...Array(columns)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-[2px] rounded-full"
+          style={{
+            left: `${5 + (i * 90) / columns + Math.random() * 3}%`,
+            height: `${80 + Math.random() * 120}px`,
+            background: `linear-gradient(180deg, transparent 0%, hsl(168 80% 55% / ${0.4 + Math.random() * 0.4}) 50%, hsl(168 90% 65%) 100%)`,
+            boxShadow: `0 0 ${8 + Math.random() * 8}px hsl(168 80% 55% / 0.5)`,
+            animation: `matrix-fall ${7 + Math.random() * 8}s linear infinite`,
+            animationDelay: `${-Math.random() * 10}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 // Floating particles component
 function FloatingParticles() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {[...Array(15)].map((_, i) => (
         <div
           key={i}
           className="particle"
@@ -154,8 +177,8 @@ function FloatingParticles() {
             top: `${Math.random() * 100}%`,
             animationDelay: `${Math.random() * 10}s`,
             animationDuration: `${8 + Math.random() * 12}s`,
-            width: `${2 + Math.random() * 4}px`,
-            height: `${2 + Math.random() * 4}px`,
+            width: `${2 + Math.random() * 3}px`,
+            height: `${2 + Math.random() * 3}px`,
           }}
         />
       ))}
@@ -200,12 +223,17 @@ export default function NodenomicsLanding() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Aurora background */}
+      {/* Matrix rain background */}
       <div className="aurora-bg">
         <div className="aurora-orb aurora-orb-1" />
         <div className="aurora-orb aurora-orb-2" />
         <div className="aurora-orb aurora-orb-3" />
+        {/* Additional matrix streams via CSS pseudo-elements */}
       </div>
+      <div className="matrix-glow" />
+
+      {/* Extra matrix columns */}
+      <MatrixRain />
 
       {/* Animated gradient background */}
       <div
@@ -460,27 +488,27 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
           </div>
         </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6">
           {participants.map((participant, idx) => (
             <Reveal key={participant.type} delay={idx * 100}>
-              <Card className="glass-card card-hover h-full border-border/50">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    {participant.icon === "sensor" && <Database className="w-8 h-8 text-primary" />}
-                    {participant.icon === "cog" && <Cpu className="w-8 h-8 text-primary" />}
-                    {participant.icon === "bot" && <Bot className="w-8 h-8 text-primary" />}
+              <Card className="glass-card card-hover h-full">
+                <CardHeader className="pb-4">
+                  <div className="w-14 h-14 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mb-4">
+                    {participant.icon === "sensor" && <Database className="w-7 h-7 text-primary" />}
+                    {participant.icon === "cog" && <Cpu className="w-7 h-7 text-primary" />}
+                    {participant.icon === "bot" && <Bot className="w-7 h-7 text-primary" />}
                   </div>
-                  <CardTitle className="text-2xl">{participant.title}</CardTitle>
+                  <CardTitle className="text-xl">{participant.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-8 leading-relaxed">{participant.description}</p>
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
-                      <span className="text-xs text-primary font-bold tracking-wider block mb-2">SELLS</span>
+                <CardContent className="pt-0">
+                  <p className="text-muted-foreground mb-6 leading-relaxed text-sm">{participant.description}</p>
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg bg-primary/10 border border-primary/40">
+                      <span className="text-[10px] text-primary font-bold tracking-wider block mb-1">SELLS</span>
                       <span className="text-sm font-medium">{participant.sells}</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                      <span className="text-xs text-muted-foreground font-bold tracking-wider block mb-2">BUYS</span>
+                    <div className="p-3 rounded-lg bg-secondary border border-border">
+                      <span className="text-[10px] text-muted-foreground font-bold tracking-wider block mb-1">BUYS</span>
                       <span className="text-sm font-medium">{participant.buys}</span>
                     </div>
                   </div>
@@ -492,27 +520,27 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
 
         {/* Data Flow */}
         <Reveal delay={300}>
-          <div className="mt-16 p-10 rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 relative overflow-hidden">
-            <div className="absolute inset-0 dot-pattern opacity-30" />
-            <h3 className="text-2xl font-bold text-center mb-10 relative z-10">How Data Flows</h3>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+          <div className="mt-12 p-8 rounded-2xl bg-card border border-border relative overflow-hidden">
+            <div className="absolute inset-0 dot-pattern opacity-20" />
+            <h3 className="text-xl font-bold text-center mb-8 relative z-10">How Data Flows</h3>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
               {[
                 { icon: Database, label: "IoT Devices\ngenerate raw data" },
                 { icon: Cpu, label: "Brokers refine\nand enrich data" },
                 { icon: Bot, label: "AI Agents use\ndata for missions" },
                 { icon: Zap, label: "Compute resources\ncirculate back" },
               ].map((step, idx) => (
-                <div key={idx} className="flex items-center gap-6">
+                <div key={idx} className="flex items-center gap-4">
                   <div className="text-center group">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-primary/30 transition-all duration-300">
-                      <step.icon className="w-8 h-8 text-primary" />
+                    <div className="w-14 h-14 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:bg-primary/25 transition-all duration-300">
+                      <step.icon className="w-7 h-7 text-primary" />
                     </div>
-                    <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{step.label}</p>
+                    <p className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed">{step.label}</p>
                   </div>
                   {idx < 3 && (
                     <div className="hidden md:flex items-center">
-                      <div className="w-16 h-[2px] bg-gradient-to-r from-primary/50 to-primary/20" />
-                      <ChevronRight className="w-5 h-5 text-primary -ml-1" />
+                      <div className="w-12 h-[2px] bg-gradient-to-r from-primary to-primary/30" />
+                      <ChevronRight className="w-4 h-4 text-primary -ml-1" />
                     </div>
                   )}
                 </div>
@@ -535,7 +563,7 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
           </div>
         </Reveal>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6">
           {[
             {
               icon: Zap,
@@ -564,16 +592,16 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
           ].map((feature, idx) => (
             <Reveal key={idx} delay={idx * 100}>
               <Card
-                className="glass-card card-hover cursor-pointer group border-border/50"
+                className="glass-card card-hover cursor-pointer group"
                 onClick={() => onNavigate(feature.link)}
               >
-                <CardContent className="p-8">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="w-7 h-7 text-primary" />
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-primary/25 transition-all duration-300">
+                    <feature.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">{feature.description}</p>
-                  <span className="text-primary text-sm font-semibold flex items-center gap-2 group-hover:gap-4 transition-all">
+                  <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground mb-5 leading-relaxed text-sm">{feature.description}</p>
+                  <span className="text-primary text-sm font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
                     Learn more
                     <ArrowRight className="w-4 h-4" />
                   </span>
