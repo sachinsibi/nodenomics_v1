@@ -32,6 +32,7 @@ import { participants, industryApplications, humanitarianCases } from "@/lib/imp
 import { researchThemes, researchStats, keyTechnologies } from "@/lib/research-data"
 import { faqCategories } from "@/lib/faq-data"
 import { PricingCalculator } from "@/components/pricing-calculator"
+import { MatrixRain } from "@/components/matrix-rain"
 
 type TabSection = "home" | "impact" | "research" | "partners" | "faq"
 
@@ -141,29 +142,6 @@ function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: strin
   )
 }
 
-// Matrix rain component
-function MatrixRain() {
-  const columns = 15
-  return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {[...Array(columns)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-[2px] rounded-full"
-          style={{
-            left: `${5 + (i * 90) / columns + Math.random() * 3}%`,
-            height: `${80 + Math.random() * 120}px`,
-            background: `linear-gradient(180deg, transparent 0%, hsl(168 80% 55% / ${0.4 + Math.random() * 0.4}) 50%, hsl(168 90% 65%) 100%)`,
-            boxShadow: `0 0 ${8 + Math.random() * 8}px hsl(168 80% 55% / 0.5)`,
-            animation: `matrix-fall ${7 + Math.random() * 8}s linear infinite`,
-            animationDelay: `${-Math.random() * 10}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
 // Floating particles component
 function FloatingParticles() {
   return (
@@ -223,17 +201,15 @@ export default function NodenomicsLanding() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Matrix rain background */}
+      {/* Ambient background */}
       <div className="aurora-bg">
         <div className="aurora-orb aurora-orb-1" />
         <div className="aurora-orb aurora-orb-2" />
         <div className="aurora-orb aurora-orb-3" />
-        {/* Additional matrix streams via CSS pseudo-elements */}
       </div>
-      <div className="matrix-glow" />
 
-      {/* Extra matrix columns */}
-      <MatrixRain />
+      {/* Matrix Rain Animation */}
+      <MatrixRain opacity={0.35} speed={1} />
 
       {/* Animated gradient background */}
       <div
@@ -249,16 +225,15 @@ export default function NodenomicsLanding() {
 
       {/* Header */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-500 ${
-          isScrolled ? "header-blur header-scrolled" : "bg-transparent"
-        }`}
+        className={`sticky top-0 z-50 transition-all duration-500 ${isScrolled ? "header-blur header-scrolled" : "bg-transparent"
+          }`}
       >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3 group cursor-pointer" onClick={() => handleTabChange("home")}>
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center glow group-hover:scale-110 transition-transform duration-300">
-                <Network className="w-6 h-6 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center glow group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/20">
+                <Network className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold tracking-tight font-sans">
                 NODE<span className="text-primary">NOMICS</span>
@@ -306,11 +281,10 @@ export default function NodenomicsLanding() {
                   <button
                     key={tab.value}
                     onClick={() => handleTabChange(tab.value)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                      activeSection === tab.value
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-secondary/50"
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeSection === tab.value
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-secondary/50"
+                      }`}
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
                     <tab.icon className="w-5 h-5" />
@@ -347,8 +321,8 @@ export default function NodenomicsLanding() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                  <Network className="w-6 h-6 text-primary" />
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Network className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <span className="font-bold text-lg">NODENOMICS</span>
               </div>
@@ -359,7 +333,7 @@ export default function NodenomicsLanding() {
                 {["LinkedIn", "X", "GitHub"].map((social) => (
                   <button
                     key={social}
-                    className="w-10 h-10 rounded-lg bg-secondary/50 hover:bg-primary/20 hover:text-primary flex items-center justify-center transition-all duration-300"
+                    className="w-10 h-10 rounded-lg bg-secondary/50 hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-300 btn-glow"
                   >
                     <span className="text-xs font-medium">{social[0]}</span>
                   </button>
@@ -492,22 +466,22 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
           {participants.map((participant, idx) => (
             <Reveal key={participant.type} delay={idx * 100}>
               <Card className="glass-card card-hover h-full">
-                <CardHeader className="pb-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mb-4">
-                    {participant.icon === "sensor" && <Database className="w-7 h-7 text-primary" />}
-                    {participant.icon === "cog" && <Cpu className="w-7 h-7 text-primary" />}
-                    {participant.icon === "bot" && <Bot className="w-7 h-7 text-primary" />}
+                <CardHeader className="p-6 pb-4">
+                  <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/30">
+                    {participant.icon === "sensor" && <Database className="w-7 h-7 text-primary-foreground" />}
+                    {participant.icon === "cog" && <Cpu className="w-7 h-7 text-primary-foreground" />}
+                    {participant.icon === "bot" && <Bot className="w-7 h-7 text-primary-foreground" />}
                   </div>
                   <CardTitle className="text-xl">{participant.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className="p-6 pt-0">
                   <p className="text-muted-foreground mb-6 leading-relaxed text-sm">{participant.description}</p>
                   <div className="space-y-3">
-                    <div className="p-3 rounded-lg bg-primary/10 border border-primary/40">
-                      <span className="text-[10px] text-primary font-bold tracking-wider block mb-1">SELLS</span>
-                      <span className="text-sm font-medium">{participant.sells}</span>
+                    <div className="p-4 rounded-lg bg-primary text-primary-foreground btn-glow shadow-lg shadow-primary/20">
+                      <span className="text-[10px] text-primary-foreground/90 font-bold tracking-wider block mb-1">SELLS</span>
+                      <span className="text-sm font-bold">{participant.sells}</span>
                     </div>
-                    <div className="p-3 rounded-lg bg-secondary border border-border">
+                    <div className="p-4 rounded-lg bg-secondary border border-border">
                       <span className="text-[10px] text-muted-foreground font-bold tracking-wider block mb-1">BUYS</span>
                       <span className="text-sm font-medium">{participant.buys}</span>
                     </div>
@@ -522,25 +496,28 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
         <Reveal delay={300}>
           <div className="mt-12 p-8 rounded-2xl bg-card border border-border relative overflow-hidden">
             <div className="absolute inset-0 dot-pattern opacity-20" />
-            <h3 className="text-xl font-bold text-center mb-8 relative z-10">How Data Flows</h3>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+            <h3 className="text-xl font-bold text-center mb-10 relative z-10">How Data Flows</h3>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 relative z-10">
               {[
                 { icon: Database, label: "IoT Devices\ngenerate raw data" },
                 { icon: Cpu, label: "Brokers refine\nand enrich data" },
                 { icon: Bot, label: "AI Agents use\ndata for missions" },
                 { icon: Zap, label: "Compute resources\ncirculate back" },
               ].map((step, idx) => (
-                <div key={idx} className="flex items-center gap-4">
-                  <div className="text-center group">
-                    <div className="w-14 h-14 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:bg-primary/25 transition-all duration-300">
-                      <step.icon className="w-7 h-7 text-primary" />
+                <div key={idx} className="contents">
+                  {/* Icon Box */}
+                  <div className="text-center group flex-shrink-0 w-28">
+                    <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-all duration-300 shadow-lg shadow-primary/30">
+                      <step.icon className="w-7 h-7 text-primary-foreground" />
                     </div>
                     <p className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed">{step.label}</p>
                   </div>
+
+                  {/* Arrow - positioned between icons */}
                   {idx < 3 && (
-                    <div className="hidden md:flex items-center">
-                      <div className="w-12 h-[2px] bg-gradient-to-r from-primary to-primary/30" />
-                      <ChevronRight className="w-4 h-4 text-primary -ml-1" />
+                    <div className="hidden md:flex items-center justify-center px-4 flex-shrink-0">
+                      <div className="w-8 h-[2px] bg-gradient-to-r from-primary to-primary/50" />
+                      <ChevronRight className="w-5 h-5 text-primary -ml-1" />
                     </div>
                   )}
                 </div>
@@ -595,11 +572,11 @@ function HomeSection({ onNavigate }: { onNavigate: (section: string) => void }) 
                 className="glass-card card-hover cursor-pointer group"
                 onClick={() => onNavigate(feature.link)}
               >
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-primary/25 transition-all duration-300">
-                    <feature.icon className="w-6 h-6 text-primary" />
+                <CardContent className="p-6 pt-6">
+                  <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mb-5 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-primary/30">
+                    <feature.icon className="w-6 h-6 text-primary-foreground" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
+                  <h3 className="text-lg font-bold mb-3">{feature.title}</h3>
                   <p className="text-muted-foreground mb-5 leading-relaxed text-sm">{feature.description}</p>
                   <span className="text-primary text-sm font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
                     Learn more
@@ -729,7 +706,7 @@ function ImpactSection() {
                 <Card className="glass-card card-hover h-full border-border/50">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-2 mb-4">
-                      <Badge className="bg-primary/20 text-primary border-primary/30">{app.industry}</Badge>
+                      <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 btn-glow shadow-primary/20">{app.industry}</Badge>
                       {app.researchSource && (
                         <Badge variant="outline" className="text-xs">Research-backed</Badge>
                       )}
@@ -763,9 +740,9 @@ function ImpactSection() {
                         <span className="text-xs text-primary font-bold tracking-wider block mb-2">AI AGENT</span>
                         <span className="text-sm">{mission.aiAgent}</span>
                       </div>
-                      <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
-                        <span className="text-xs text-primary font-bold tracking-wider block mb-2">MEASURED IMPACT</span>
-                        <span className="text-sm font-semibold">{mission.impact}</span>
+                      <div className="p-4 rounded-xl bg-primary text-primary-foreground btn-glow shadow-lg shadow-primary/20">
+                        <span className="text-xs text-primary-foreground/90 font-bold tracking-wider block mb-2">MEASURED IMPACT</span>
+                        <span className="text-sm">{mission.impact}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -844,10 +821,10 @@ function ResearchSection() {
               >
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <Badge className="bg-primary/20 text-primary border-primary/30">
+                    <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 btn-glow shadow-primary/20">
                       {theme.citationCount.toLocaleString()} citations
                     </Badge>
-                    <button className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold transition-transform duration-300">
+                    <button className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold transition-transform duration-300 shadow-lg shadow-primary/20">
                       {expandedTheme === theme.id ? "−" : "+"}
                     </button>
                   </div>
@@ -941,10 +918,10 @@ function PartnersSection() {
             <Card className="glass-card border-border/50 overflow-hidden">
               <CardContent className="p-10">
                 <div className="flex flex-col md:flex-row items-start gap-8">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-                    {participant.icon === "sensor" && <Database className="w-10 h-10 text-primary" />}
-                    {participant.icon === "cog" && <Cpu className="w-10 h-10 text-primary" />}
-                    {participant.icon === "bot" && <Bot className="w-10 h-10 text-primary" />}
+                  <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/30">
+                    {participant.icon === "sensor" && <Database className="w-10 h-10 text-primary-foreground" />}
+                    {participant.icon === "cog" && <Cpu className="w-10 h-10 text-primary-foreground" />}
+                    {participant.icon === "bot" && <Bot className="w-10 h-10 text-primary-foreground" />}
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold mb-2">For {participant.title}</h3>
@@ -997,11 +974,11 @@ function PartnersSection() {
           <Reveal key={idx} delay={idx * 50}>
             <Card className="glass-card card-hover border-border/50 h-full">
               <CardContent className="p-6">
-                <Badge className="bg-primary/20 text-primary border-primary/30 mb-4">{partner.category}</Badge>
+                <Badge className="bg-primary text-primary-foreground btn-glow shadow-primary/20 mb-4">{partner.category}</Badge>
                 <ul className="space-y-2">
                   {partner.examples.map((ex, i) => (
                     <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                       {ex}
                     </li>
                   ))}
@@ -1080,7 +1057,7 @@ function FAQSection({
         {faqCategories.map((category, catIdx) => (
           <div key={catIdx}>
             <Reveal delay={catIdx * 50}>
-              <Badge className="bg-primary/20 text-primary border-primary/30 mb-6 text-sm">{category.category}</Badge>
+              <Badge className="bg-primary text-primary-foreground btn-glow shadow-primary/20 mb-6 text-sm">{category.category}</Badge>
             </Reveal>
             <div className="space-y-4">
               {category.questions.map((faq, qIdx) => {
@@ -1105,8 +1082,8 @@ function FAQSection({
                             <div className="mt-6 pt-6 border-t border-border">
                               <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                               {faq.researchSource && (
-                                <div className="mt-4 p-4 rounded-xl bg-primary/10 border border-primary/30">
-                                  <p className="text-xs text-primary">
+                                <div className="mt-4 p-4 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/10">
+                                  <p className="text-xs text-primary-foreground/90">
                                     <strong>Research Source:</strong> {faq.researchSource}
                                   </p>
                                 </div>
@@ -1134,8 +1111,8 @@ function FAQSection({
           ].map((link, idx) => (
             <Card key={idx} className="text-center glass-card card-hover border-border/50">
               <CardContent className="p-8">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-6">
-                  <link.icon className="w-7 h-7 text-primary" />
+                <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/30">
+                  <link.icon className="w-7 h-7 text-primary-foreground" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">{link.title}</h3>
                 <p className="text-sm text-muted-foreground">{link.description}</p>

@@ -168,8 +168,8 @@ export function PricingCalculator() {
       <Card className="glass-card border-border/50 overflow-hidden">
         <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent">
           <CardTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Server className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+              <Server className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <span className="block">Configure Your Compute Requirements</span>
@@ -183,8 +183,8 @@ export function PricingCalculator() {
             <div className="space-y-5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Cpu className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-colors shadow-lg shadow-primary/20">
+                    <Cpu className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <span className="font-semibold">vCPUs</span>
                 </div>
@@ -210,8 +210,8 @@ export function PricingCalculator() {
             <div className="space-y-5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Zap className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-colors shadow-lg shadow-primary/20">
+                    <Zap className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <span className="font-semibold">Memory</span>
                 </div>
@@ -237,8 +237,8 @@ export function PricingCalculator() {
             <div className="space-y-5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <HardDrive className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-colors shadow-lg shadow-primary/20">
+                    <HardDrive className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <span className="font-semibold">Storage</span>
                 </div>
@@ -264,8 +264,8 @@ export function PricingCalculator() {
             <div className="space-y-5 group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Clock className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-colors shadow-lg shadow-primary/20">
+                    <Clock className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <span className="font-semibold">Hours</span>
                 </div>
@@ -295,8 +295,8 @@ export function PricingCalculator() {
         <Card className="premium-card bg-gradient-to-br from-primary/15 via-primary/10 to-transparent border-primary/30 overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
           <CardContent className="p-8 text-center relative z-10">
-            <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
-              <TrendingDown className="w-7 h-7 text-primary" />
+            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
+              <TrendingDown className="w-7 h-7 text-primary-foreground" />
             </div>
             <p className="text-5xl font-bold text-primary mb-2 font-mono">
               <AnimatedNumber value={savings.percentage} decimals={0} />%
@@ -317,8 +317,8 @@ export function PricingCalculator() {
         </Card>
         <Card className="glass-card border-border/50">
           <CardContent className="p-8 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Server className="w-7 h-7 text-primary" />
+            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
+              <Server className="w-7 h-7 text-primary-foreground" />
             </div>
             <p className="text-5xl font-bold text-primary mb-2 font-mono">
               $<AnimatedNumber value={prices.find((p) => p.name === "Nodenomics")?.price || 0} />
@@ -336,11 +336,10 @@ export function PricingCalculator() {
               key={view.id}
               variant="ghost"
               onClick={() => setActiveView(view.id)}
-              className={`relative px-6 py-2.5 rounded-lg transition-all duration-300 ${
-                activeView === view.id
+              className={`relative px-6 py-2.5 rounded-lg transition-all duration-300 ${activeView === view.id
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
                   : "hover:bg-secondary/50 text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <view.icon className="w-4 h-4 mr-2" />
               {view.label}
@@ -524,11 +523,10 @@ export function PricingCalculator() {
         {prices.map((provider) => (
           <Card
             key={provider.name}
-            className={`transition-all duration-300 cursor-pointer ${
-              provider.name === "Nodenomics"
+            className={`transition-all duration-300 cursor-pointer ${provider.name === "Nodenomics"
                 ? "border-2 border-primary bg-gradient-to-br from-primary/10 to-transparent pulse-glow"
                 : "glass-card border-border/50 hover:border-primary/30"
-            }`}
+              }`}
             onMouseEnter={() => setIsHovered(provider.name)}
             onMouseLeave={() => setIsHovered(null)}
             style={{
@@ -546,7 +544,7 @@ export function PricingCalculator() {
                 />
                 <span className="font-semibold">{provider.name}</span>
                 {provider.name === "Nodenomics" && (
-                  <Badge className="ml-auto bg-primary/20 text-primary border-primary/30">
+                  <Badge className="ml-auto bg-primary text-primary-foreground border-primary/30 btn-glow">
                     Best Value
                   </Badge>
                 )}
@@ -564,8 +562,8 @@ export function PricingCalculator() {
       <Card className="premium-card bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20 overflow-hidden">
         <CardContent className="p-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+              <Zap className="w-8 h-8 text-primary-foreground" />
             </div>
             <div className="text-center md:text-left flex-1">
               <h3 className="font-bold text-lg mb-2">Why Nodenomics is More Affordable</h3>

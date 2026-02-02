@@ -96,32 +96,22 @@ html {
   animation: gradient-shift 15s ease infinite;
 }
 
-/* Matrix rain background effect */
-@keyframes matrix-fall {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
+/* Subtle ambient background effect */
+@keyframes ambient-pulse {
+  0%, 100% {
+    opacity: 0.3;
   }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh);
-    opacity: 0;
+  50% {
+    opacity: 0.5;
   }
 }
 
-@keyframes matrix-glow {
+@keyframes subtle-float {
   0%, 100% {
-    opacity: 0.3;
-    filter: blur(0px);
+    transform: translateY(0) scale(1);
   }
   50% {
-    opacity: 0.6;
-    filter: blur(1px);
+    transform: translateY(-20px) scale(1.02);
   }
 }
 
@@ -130,86 +120,81 @@ html {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  background: linear-gradient(180deg,
-    hsl(var(--background)) 0%,
-    hsl(168 50% 5%) 50%,
-    hsl(var(--background)) 100%);
+  background: radial-gradient(ellipse at 50% 0%, hsl(168 50% 8%) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 80%, hsl(168 40% 6%) 0%, transparent 40%),
+              radial-gradient(ellipse at 20% 60%, hsl(168 40% 5%) 0%, transparent 35%);
 }
 
-/* Matrix columns */
+/* Ambient glowing orbs */
 .aurora-orb {
   position: absolute;
-  width: 2px;
-  height: 150px;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    hsl(var(--primary) / 0.8) 50%,
-    hsl(var(--accent)) 100%);
-  border-radius: 2px;
-  animation: matrix-fall linear infinite;
-  box-shadow: 0 0 10px hsl(var(--primary) / 0.5),
-              0 0 20px hsl(var(--primary) / 0.3);
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: subtle-float 20s ease-in-out infinite;
 }
 
 .aurora-orb-1 {
-  left: 10%;
-  animation-duration: 8s;
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  right: 10%;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.15) 0%, transparent 70%);
   animation-delay: 0s;
-  height: 120px;
 }
 
 .aurora-orb-2 {
-  left: 25%;
-  animation-duration: 12s;
-  animation-delay: -2s;
-  height: 180px;
+  width: 300px;
+  height: 300px;
+  bottom: 10%;
+  left: 5%;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.1) 0%, transparent 70%);
+  animation-delay: -7s;
 }
 
 .aurora-orb-3 {
+  width: 350px;
+  height: 350px;
+  top: 40%;
   left: 40%;
-  animation-duration: 10s;
-  animation-delay: -4s;
-  height: 100px;
+  background: radial-gradient(circle, hsl(var(--accent) / 0.08) 0%, transparent 70%);
+  animation-delay: -14s;
 }
 
-/* Additional matrix streams */
-.aurora-bg::before,
-.aurora-bg::after {
-  content: '';
-  position: absolute;
-  width: 2px;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    hsl(var(--primary) / 0.6) 50%,
-    hsl(var(--accent) / 0.8) 100%);
-  border-radius: 2px;
-  animation: matrix-fall linear infinite;
-  box-shadow: 0 0 8px hsl(var(--primary) / 0.4);
-}
-
-.aurora-bg::before {
-  left: 60%;
-  height: 140px;
-  animation-duration: 9s;
-  animation-delay: -1s;
-}
-
-.aurora-bg::after {
-  left: 80%;
-  height: 160px;
-  animation-duration: 11s;
-  animation-delay: -3s;
-}
-
-/* Ambient glow overlay */
+/* Ambient glow overlay - subtle Matrix-inspired effect */
 .matrix-glow {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 0%, hsl(var(--primary) / 0.15) 0%, transparent 60%),
-              radial-gradient(ellipse at 0% 50%, hsl(var(--primary) / 0.08) 0%, transparent 50%),
-              radial-gradient(ellipse at 100% 50%, hsl(var(--primary) / 0.08) 0%, transparent 50%);
-  animation: matrix-glow 4s ease-in-out infinite;
+  background: radial-gradient(ellipse at 50% 0%, hsl(var(--primary) / 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 0% 100%, hsl(var(--primary) / 0.04) 0%, transparent 40%),
+              radial-gradient(ellipse at 100% 100%, hsl(var(--primary) / 0.04) 0%, transparent 40%);
+  animation: ambient-pulse 12s ease-in-out infinite;
+}
+
+/* Subtle Matrix rain - slow falling characters */
+.matrix-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 40px,
+      hsl(var(--primary) / 0.02) 40px,
+      hsl(var(--primary) / 0.02) 41px
+    );
+  animation: matrix-fall 20s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 /* ============================================
